@@ -1,7 +1,9 @@
 package com.kosuri.rxkolan.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.Column;
@@ -16,6 +18,8 @@ import java.io.Serializable;
 @Table(name = "role")
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Role implements Serializable {
 
     @Id
@@ -25,4 +29,15 @@ public class Role implements Serializable {
 
     @Column(name = "name")
     private String name;
+
+
+    @JsonIgnore
+    @Column(name = "active", columnDefinition = "INT default 1")
+    protected boolean active = true;
+
+
+
+    public Role(String roleName){
+        this.name = roleName;
+    }
 }

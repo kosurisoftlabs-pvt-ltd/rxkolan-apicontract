@@ -42,8 +42,8 @@ public class AuthenticationController {
     }
 
     @PostMapping(value = "/otp/validate")
-    public ResponseEntity<Boolean> verifyUserOtp(@RequestBody VerifyUserOtpRequest verifyUserOtpRequest) {
-        Boolean response = authenticationService.verifyUserOtp(verifyUserOtpRequest);
+    public ResponseEntity<UserResponse> verifyUserOtp(@RequestBody VerifyUserOtpRequest verifyUserOtpRequest) {
+        UserResponse response = authenticationService.verifyUserOtp(verifyUserOtpRequest);
         return ResponseEntity.ok(response);
     }
 }

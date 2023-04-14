@@ -96,11 +96,6 @@ create table role (
         );
  create table user_reg (
        phone_number varchar(45) not null,
-        active INT default 1,
-        created_on TIMESTAMP not null,
-        created_by bigint,
-        updated_on TIMESTAMP not null,
-        updated_by bigint,
         address varchar(100),
         business_name varchar(100),
         contact_person varchar(100),
@@ -122,3 +117,23 @@ alter table role_user
        add constraint FK80uojj7jkuw92xbetkbg8ltac
        foreign key (user_id)
        references user_reg (phone_number);
+create table user_otp (
+       user_otp_id varchar(255) not null,
+        active INT default 1,
+        created_on TIMESTAMP not null,
+        created_by bigint,
+        updated_on TIMESTAMP not null,
+        updated_by bigint,
+        email varchar(100),
+        email_otp varchar(20),
+        email_otp_date DATE,
+        phone_number varchar(100),
+        phone_otp varchar(20),
+        phone_otp_date DATE,
+        user_id varchar(45) not null,
+        primary key (user_otp_id)
+    ) ;
+alter table user_otp    add constraint FK8an6nvxce3ed8ay80uvnptg7  foreign key (user_id)  references user_reg (phone_number);
+alter table user_reg  add column account_non_expired INT default 0;
+alter table user_reg  add column account_non_locked INT default 0;
+alter table user_reg  add column credentials_non_expired INT default 0;

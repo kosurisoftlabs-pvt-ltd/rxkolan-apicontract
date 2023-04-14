@@ -1,5 +1,6 @@
 package com.kosuri.rxkolan.model.user;
 
+import com.kosuri.rxkolan.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,6 +23,15 @@ public class UserResponse {
     private boolean emailVerified;
 
     private boolean phoneVerified;
+
+
+    public UserResponse(User user){
+        this.email = user.getEmail();
+        this.phoneNumber = user.getPhoneNumber();
+        this.userId = user.getPhoneNumber();
+        this.emailVerified = user.isEmailVerified();
+        this.phoneVerified = user.isPhoneVerified();
+    }
 
 
 }

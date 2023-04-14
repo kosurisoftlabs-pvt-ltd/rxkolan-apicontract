@@ -1,11 +1,15 @@
 package com.kosuri.rxkolan.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.annotations.GenericGenerator;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,6 +19,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @Getter
@@ -23,8 +29,9 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Builder
 @Table(name = "user_reg")
-public class User extends BaseEntity{
+public class User implements UserDetails  {
 
     @Id
     @Column(name="phone_number",length = 45)
@@ -65,6 +72,13 @@ public class User extends BaseEntity{
     private String speciality;
 
 
+    @Column(name = "account_non_expired", columnDefinition = "INT default 0")
+    private boolean accountNonExpired;
+    @Column(name = "credentials_non_expired", columnDefinition = "INT default 0")
+    private boolean credentialsNonExpired;
+    @Column(name = "account_non_locked", columnDefinition = "INT default 0")
+    private boolean accountNonLocked;
+
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "role_user", joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "phone_number")},
@@ -72,4 +86,38 @@ public class User extends BaseEntity{
                     @JoinColumn(name = "role_id", referencedColumnName = "id")})
     private List<Role> roles;
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        if (roles == null) {
+            return Collections.emptyList();
+        }
+        return roles.stream().map(e -> new SimpleGrantedAuthority(e.getName())).toList();
+    }
+
+    @Override
+    public String getUsername() {
+        if(StringUtils.isAllEmpty(phoneNumber)){
+            return email;
+        }else return phoneNumber;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return accountNonExpired;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return accountNonLocked;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return credentialsNonExpired;
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
 }

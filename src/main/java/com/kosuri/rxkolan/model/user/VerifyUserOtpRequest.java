@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.NotEmpty;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -13,8 +15,9 @@ import lombok.Setter;
 @Builder
 public class VerifyUserOtpRequest {
 
-    private String username;
     private String phoneNumber;
     private String email;
+
+    @NotEmpty(message = "OTP Cannot Be Empty")
     private String otp;
 }

@@ -1,6 +1,7 @@
 package com.kosuri.rxkolan.model.user;
 
 import com.kosuri.rxkolan.entity.Role;
+import com.kosuri.rxkolan.entity.ServiceOfferedEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,6 +23,7 @@ public class RegistrationRequest {
 
 
     @Size(min = 10, max = 10)
+    @NotEmpty(message = "Phone Number Cannot Be Empty")
     private String phoneNumber;
 
     @Email
@@ -33,7 +35,7 @@ public class RegistrationRequest {
     )
     private String password;
 
-    private List<Role> roles;
+    private List<String> roleName;
 
     private boolean emailVerified = false;
 
@@ -48,6 +50,8 @@ public class RegistrationRequest {
     private String districtLocation;
 
     private String speciality;
+
+    private ServiceOfferedEnum serviceOffered;
 
 
 }

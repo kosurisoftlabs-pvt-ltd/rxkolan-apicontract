@@ -17,5 +17,5 @@ public interface AuthenticationService {
 
     Boolean validateUser(ValidateUserRequest validateUserRequest);
 
-    Boolean verifyUserOtp(VerifyUserOtpRequest verifyUserOtpRequest);
+    UserResponse verifyUserOtp(VerifyUserOtpRequest verifyUserOtpRequest);
 }
