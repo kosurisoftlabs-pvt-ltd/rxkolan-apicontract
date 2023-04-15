@@ -100,6 +100,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public Boolean validateUser(ValidateUserRequest validateUserRequest) {
+        log.info("Validating User Based On Email Or Phone Number");
+        Optional<User> userOptional = Optional.empty();
+        if (StringUtils.isNotEmpty(validateUserRequest.getEmail())) {
+            userOptional = userRepository.findByEmail(validateUserRequest.getEmail());
+        } else if (StringUtils.isNotEmpty(validateUserRequest.getPhoneNumber())) {
+            userOptional = userRepository.findByPhoneNumber(validateUserRequest.getPhoneNumber());
+        }
+
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            user.setEnabled(true);
+            userRepository.save(user);
+            return true;
+        }
         return false;
     }
 
