@@ -1,5 +1,6 @@
 package com.kosuri.rxkolan.model.ambulance;
 
+import com.kosuri.rxkolan.entity.Ambulance;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,6 +32,15 @@ public class AmbulanceResponse {
 
     private String licenseNumber;
 
-    private String status;
+    private boolean verified;
+
+    public AmbulanceResponse(Ambulance ambulance){
+        this.registrationNumber = ambulance.getAmbulanceRegNumber();;
+        this.vin= ambulance.getVin();
+        this.phoneNumber = ambulance.getVin();
+        this.contactPerson= ambulance.getOwnerName();
+        this.state=ambulance.getState();
+        this.verified = ambulance.isVerified();
+    }
 
 }

@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -43,8 +44,9 @@ public class AmbulanceController {
     public ResponseEntity<AmbulanceResponse> createAmbulance(@RequestPart("ambulance") @Valid AmbulanceCreationRequest ambulanceCreationRequest,
                                                              @RequestPart(value = "vehicleRC", required = false) List<MultipartFile> vehicleRC,
                                                              @RequestPart(value = "licenseCertificate", required = false) List<MultipartFile> licenseCertificate,
-                                                             @RequestPart(value = "numberPlatePhoto", required = false) MultipartFile numberPlatePhoto){
-       AmbulanceResponse ambulanceResponse =  ambulanceService.createAmbulance(ambulanceCreationRequest,vehicleRC,licenseCertificate,numberPlatePhoto);
+                                                             @RequestPart(value = "numberPlatePhoto", required = false) MultipartFile numberPlatePhoto,
+                                                             HttpServletRequest request){
+       AmbulanceResponse ambulanceResponse =  ambulanceService.createAmbulance(ambulanceCreationRequest,vehicleRC,licenseCertificate,numberPlatePhoto,request);
        return  ResponseEntity.ok(ambulanceResponse);
     }
 
@@ -72,8 +74,8 @@ public class AmbulanceController {
     @PatchMapping("/verify/{id}")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Verify Existing Ambulance By ID By Admin")
-    public ResponseEntity<AmbulanceResponse> createAmbulance(@PathVariable("id") String ambulanceId){
-        AmbulanceResponse ambulanceResponse =  ambulanceService.verifyAmbulance(ambulanceId);
+    public ResponseEntity<AmbulanceResponse> createAmbulance(@PathVariable("id") String ambulanceId, HttpServletRequest request){
+        AmbulanceResponse ambulanceResponse =  ambulanceService.verifyAmbulance(ambulanceId,request);
         return  ResponseEntity.ok(ambulanceResponse);
     }
 }

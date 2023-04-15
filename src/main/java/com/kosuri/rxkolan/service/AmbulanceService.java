@@ -8,10 +8,11 @@ import com.kosuri.rxkolan.model.search.SearchDto;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 public interface AmbulanceService {
-    AmbulanceResponse createAmbulance(AmbulanceCreationRequest ambulanceCreationRequest, List<MultipartFile> vehicleRC, List<MultipartFile> licenseCertificate, MultipartFile numberPlatePhoto);
+    AmbulanceResponse createAmbulance(AmbulanceCreationRequest ambulanceCreationRequest, List<MultipartFile> vehicleRC, List<MultipartFile> licenseCertificate, MultipartFile numberPlatePhoto, HttpServletRequest request);
 
     AmbulanceResponse updateExistingAmbulance(String ambulanceId, AmbulanceUpdateRequest updateRequest);
 
@@ -19,5 +20,5 @@ public interface AmbulanceService {
 
     PageableResponse<AmbulanceResponse> fetchAllAmbulanceBySearchCriteria(SearchDto request, Pageable pageable);
 
-    AmbulanceResponse verifyAmbulance(String ambulanceId);
+    AmbulanceResponse verifyAmbulance(String ambulanceId, HttpServletRequest servletRequest);
 }

@@ -1,6 +1,8 @@
 package com.kosuri.rxkolan.service.impl;
 
+import com.kosuri.rxkolan.constant.ErrorConstants;
 import com.kosuri.rxkolan.entity.Ambulance;
+import com.kosuri.rxkolan.exception.BadRequestException;
 import com.kosuri.rxkolan.model.ambulance.AmbulanceUpdateRequest;
 import com.kosuri.rxkolan.model.pagination.PageableResponse;
 import com.kosuri.rxkolan.model.search.SearchCriteria;
@@ -9,16 +11,26 @@ import com.kosuri.rxkolan.repository.AmbulanceRepository;
 import com.kosuri.rxkolan.model.ambulance.AmbulanceCreationRequest;
 import com.kosuri.rxkolan.model.ambulance.AmbulanceResponse;
 import com.kosuri.rxkolan.search.AmbulanceSpecificationBuilder;
+import com.kosuri.rxkolan.security.TokenProvider;
 import com.kosuri.rxkolan.service.AmbulanceService;
 import com.kosuri.rxkolan.util.PageUtil;
+import com.kosuri.rxkolan.util.RequestUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.NotNull;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,24 +38,66 @@ import java.util.List;
 public class AmbulanceServiceImpl implements AmbulanceService {
 
     private final AmbulanceRepository ambulanceRepository;
+    private final TokenProvider tokenProvider;
 
 
     @Override
+    @Transactional
     public AmbulanceResponse createAmbulance(AmbulanceCreationRequest ambulanceCreationRequest,
                                              List<MultipartFile> vehicleRC, List<MultipartFile> licenseCertificate,
-                                             MultipartFile numberPlatePhoto) {
+                                             MultipartFile numberPlatePhoto, HttpServletRequest request) {
         log.info("Create Ambulance Triggered For Owner Name {}",ambulanceCreationRequest.getOwnerName());
-        return null;
+        Ambulance ambulance = new Ambulance();
+        String authToken = RequestUtil.getJwtFromRequest(request);
+        String username = tokenProvider.getUserNameFromToken(authToken);
+        Optional<Ambulance> ambulanceOptional =  ambulanceRepository.findByAmbulanceRegNumber(ambulanceCreationRequest.getRegistrationNumber());
+        if(ambulanceOptional.isEmpty()) {
+            ambulance.setAmbulanceRegNumber(ambulanceCreationRequest.getRegistrationNumber());
+            ambulance.setBaseLocation(ambulanceCreationRequest.getBaseLocation());
+            ambulance.setState(ambulanceCreationRequest.getState());
+            ambulance.setAdditionalFeatures(ambulanceCreationRequest.getAdditionalFeatures());
+            ambulance.setOwnerName(ambulanceCreationRequest.getOwnerName());
+            ambulance.setPhoneNumber(ambulanceCreationRequest.getContactNumber());
+            ambulance.setVehicleBrand(ambulanceCreationRequest.getVehicleBrand());
+            ambulance.setVin(ambulanceCreationRequest.getVin());
+            ambulance.setVerified(false);
+            ambulance.setUserEmail(username);
+            ambulance.setRegisteredDate(LocalDate.now(ZoneOffset.UTC));
+            ambulance = ambulanceRepository.save(ambulance);
+        }else{
+            log.error("Ambulance with Registration Number {} Has already been Registered In The System",ambulanceCreationRequest.getRegistrationNumber());
+            throw new BadRequestException(ErrorConstants.AMBULANCE_REG_ALREADY_EXISTS);
+        }
+        return new AmbulanceResponse(ambulance);
     }
 
     @Override
-    public AmbulanceResponse updateExistingAmbulance(String ambulanceId, AmbulanceUpdateRequest updateRequest) {
-        return null;
+    @Transactional
+    public AmbulanceResponse updateExistingAmbulance(@NotNull(message = "Ambulance ID Cannot Be Null") String ambulanceId, AmbulanceUpdateRequest updateRequest) {
+       log.info("Update Existing Ambulance Data For Ambulance Id {}",ambulanceId);
+        Optional<Ambulance> ambulanceOptional =  ambulanceRepository.findByAmbulanceRegNumber(ambulanceId);
+        Ambulance ambulance;
+        if(ambulanceOptional.isPresent()){
+            ambulance = ambulanceOptional.get();
+            ambulance.setBaseLocation(updateRequest.getLocation());
+            ambulance.setActive(updateRequest.getAvailable());
+            ambulanceRepository.save(ambulance);
+        }else{
+            log.error("Ambulance with Registration Number {} Is Not Present In The System",ambulanceId);
+            throw new BadRequestException(ErrorConstants.AMBULANCE_REG_NOT_FOUND);
+        }
+        return new AmbulanceResponse(ambulance);
     }
 
     @Override
     public AmbulanceResponse fetchExistingAmbulanceById(String ambulanceId) {
-        return null;
+        Optional<Ambulance> ambulanceOptional =  ambulanceRepository.findByAmbulanceRegNumber(ambulanceId);
+        if(ambulanceOptional.isPresent()){
+            return new AmbulanceResponse(ambulanceOptional.get());
+        }else{
+            log.error("Ambulance with Registration Number {} Is Not Present In The System",ambulanceId);
+            throw new BadRequestException(ErrorConstants.AMBULANCE_REG_NOT_FOUND);
+        }
     }
 
     @Override
@@ -58,15 +112,24 @@ public class AmbulanceServiceImpl implements AmbulanceService {
         }
 
         Page<Ambulance> searchResult = ambulanceRepository.findAll(builder.build(), pageable);
-        return PageUtil.pageableResponse(searchResult.map(this::buildAmbulanceResponse));
-    }
-
-    private AmbulanceResponse buildAmbulanceResponse(Ambulance ambulance) {
-        return AmbulanceResponse.builder().build();
+        return PageUtil.pageableResponse(searchResult.map(AmbulanceResponse::new));
     }
 
     @Override
-    public AmbulanceResponse verifyAmbulance(String ambulanceId) {
-        return null;
+    @Transactional
+    public AmbulanceResponse verifyAmbulance(String ambulanceId, HttpServletRequest request) {
+        Optional<Ambulance> ambulanceOptional =  ambulanceRepository.findByAmbulanceRegNumber(ambulanceId);
+        Ambulance ambulance;
+        if(ambulanceOptional.isPresent()){
+            ambulance =  ambulanceOptional.get();
+            ambulance.setVerified(true);
+            String authToken = RequestUtil.getJwtFromRequest(request);
+            String username = tokenProvider.getUserNameFromToken(authToken);
+            ambulance.setVerifiedBy(username);
+            return new AmbulanceResponse(ambulanceOptional.get());
+        }else{
+            log.error("Ambulance with Registration Number {} Is Not Present In The System",ambulanceId);
+            throw new BadRequestException(ErrorConstants.AMBULANCE_REG_NOT_FOUND);
+        }
     }
 }
