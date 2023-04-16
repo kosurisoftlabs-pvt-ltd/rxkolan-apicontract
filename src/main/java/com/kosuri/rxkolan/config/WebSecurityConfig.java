@@ -33,10 +33,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final PasswordEncoder passwordEncoder;
 
-    private static final String[] AUTH_WHITELIST = { "/api/v1/leegality/webhook", "/authenticate", "/auth/health", "/swagger-resources/**",
-            "/swagger-ui.html", "/swagger-ui/**", "/apis/api-docs", "/apis/api-docs/swagger-config", "/api-docs**",
-            "/webjars/**", "/v3/api-docs/swagger-config", "/v3/api-docs/**", "/actuator/**","/**/logout","/**/*.html" ,
-            "/**/*.png","/**/*.gif","/**/*.css","/**/*.js","/favicon.co","/api-docs/**","**/swagger-config", "/v1/users/password/health"};
+    private static final String[] AUTH_WHITELIST = { "/v1/auth/**", "/swagger-ui/**", "/swagger-ui.html/**", "/swagger-resources/**",
+            "/logout", "/api-docs/**", "/css/**", "/js/**", "/img/**", "/lib/**", "/favicon.ico",
+            "/v3/api-docs/**", "/swagger-ui/**", "/v1/device/error"};
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
