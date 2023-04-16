@@ -93,7 +93,7 @@ public class OtpServiceImpl implements OtpService {
     @Override
     public boolean validatePhoneOtp(String otp, String mobileNumber) {
         log.info("Validating Email OTP sent to MobileNumber {}",mobileNumber);
-        Optional<UserOtp> userOtpOptional = userOtpRepository.findByPhoneAndActiveTrue(mobileNumber);
+        Optional<UserOtp> userOtpOptional = userOtpRepository.findByPhoneNumberAndActiveTrue(mobileNumber);
         if(userOtpOptional.isPresent()){
             UserOtp userOtp = userOtpOptional.get();
             return userOtp.getPhoneOtp().equals(otp);

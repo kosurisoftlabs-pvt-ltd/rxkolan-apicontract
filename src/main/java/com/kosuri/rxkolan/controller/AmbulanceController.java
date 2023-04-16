@@ -8,6 +8,7 @@ import com.kosuri.rxkolan.model.pagination.PageableResponse;
 import com.kosuri.rxkolan.model.search.SearchDto;
 import com.kosuri.rxkolan.service.AmbulanceService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -31,10 +32,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 
+import static com.kosuri.rxkolan.constant.Constants.BEARER_KEY;
+
 @RestController
 @Slf4j
 @RequestMapping("/v1/ambulance")
 @RequiredArgsConstructor
+@SecurityRequirement(name = BEARER_KEY)
 public class AmbulanceController {
 
     private final AmbulanceService ambulanceService;

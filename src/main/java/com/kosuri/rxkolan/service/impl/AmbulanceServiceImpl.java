@@ -2,6 +2,7 @@ package com.kosuri.rxkolan.service.impl;
 
 import com.kosuri.rxkolan.constant.ErrorConstants;
 import com.kosuri.rxkolan.entity.Ambulance;
+import com.kosuri.rxkolan.entity.ServiceOfferedEnum;
 import com.kosuri.rxkolan.exception.BadRequestException;
 import com.kosuri.rxkolan.model.ambulance.AmbulanceUpdateRequest;
 import com.kosuri.rxkolan.model.pagination.PageableResponse;
@@ -25,9 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
@@ -51,7 +50,7 @@ public class AmbulanceServiceImpl implements AmbulanceService {
         String authToken = RequestUtil.getJwtFromRequest(request);
         String username = tokenProvider.getUserNameFromToken(authToken);
         Optional<Ambulance> ambulanceOptional =  ambulanceRepository.findByAmbulanceRegNumber(ambulanceCreationRequest.getRegistrationNumber());
-        if(ambulanceOptional.isEmpty()) {
+        if(ambulanceOptional.isEmpty() && ambulanceCreationRequest.getServiceName().equals(ServiceOfferedEnum.AM.name())) {
             ambulance.setAmbulanceRegNumber(ambulanceCreationRequest.getRegistrationNumber());
             ambulance.setBaseLocation(ambulanceCreationRequest.getBaseLocation());
             ambulance.setState(ambulanceCreationRequest.getState());

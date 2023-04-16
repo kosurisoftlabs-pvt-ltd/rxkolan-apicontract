@@ -26,7 +26,7 @@ public class MembershipPlan extends BaseEntity{
     @GeneratedValue(generator = "system-uuid")
     @GenericGenerator(name = "system-uuid", strategy = "uuid")
     @Column(name="plan_id")
-    protected String panId;
+    protected String planId;
 
     @Column(name="no_of_days")
     private Long noOfDays;

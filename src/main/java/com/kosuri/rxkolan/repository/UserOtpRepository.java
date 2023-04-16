@@ -15,6 +15,6 @@ public interface UserOtpRepository extends JpaRepository<UserOtp, String> {
 
     Optional<UserOtp> findByEmailAndActiveTrue(String email);
 
-    Optional<UserOtp> findByPhoneAndActiveTrue(String phoneNumber);
+    Optional<UserOtp> findByPhoneNumberAndActiveTrue(String phoneNumber);
 
 }

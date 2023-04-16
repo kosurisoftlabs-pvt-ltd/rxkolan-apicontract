@@ -3,6 +3,7 @@ package com.kosuri.rxkolan.controller;
 import com.kosuri.rxkolan.entity.Role;
 import com.kosuri.rxkolan.model.user.role.RoleRequest;
 import com.kosuri.rxkolan.service.RoleService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -14,9 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+import static com.kosuri.rxkolan.constant.Constants.BEARER_KEY;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/v1/role")
+@SecurityRequirement(name = BEARER_KEY)
 public class RoleController {
 
     private final RoleService roleService;

@@ -30,7 +30,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Builder
-@Table(name = "user_reg")
+@Table(name = "user_registration")
 public class User implements UserDetails  {
 
     @Id
