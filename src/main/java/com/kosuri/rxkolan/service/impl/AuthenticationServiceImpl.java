@@ -67,6 +67,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .emailVerified(false).phoneVerified(false).password(passwordEncoder.encode(registerRequest.getPassword()))
                 .speciality(registerRequest.getSpeciality()).serviceOffer(registerRequest.getServiceOffered().getDescription())
                 .districtLocation(registerRequest.getDistrictLocation()).roles(!CollectionUtils.isEmpty(roles)?roles:null)
+                .serviceOffer(registerRequest.getServiceOffered().name())
                 .build();
         user = userRepository.save(user);
         boolean emailOtpSent = otpService.sendOtpToEmail(registerRequest.getEmail(), user);

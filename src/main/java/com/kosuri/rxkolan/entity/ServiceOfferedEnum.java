@@ -5,7 +5,7 @@ import java.util.Map;
 
 public enum ServiceOfferedEnum {
 
-    AM("Ambulance");
+    AM("Ambulance"), DG("Diagnostics");
 
     private final String description;
 

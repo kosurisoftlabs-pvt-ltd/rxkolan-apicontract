@@ -1,5 +1,6 @@
 package com.kosuri.rxkolan.model.user;
 
+import com.kosuri.rxkolan.entity.ServiceOfferedEnum;
 import com.kosuri.rxkolan.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,6 +25,8 @@ public class UserResponse {
 
     private boolean phoneVerified;
 
+    private ServiceOfferedEnum serviceOffered;
+
 
     public UserResponse(User user){
         this.email = user.getEmail();
@@ -31,6 +34,7 @@ public class UserResponse {
         this.userId = user.getPhoneNumber();
         this.emailVerified = user.isEmailVerified();
         this.phoneVerified = user.isPhoneVerified();
+        this.serviceOffered= ServiceOfferedEnum.get(user.getServiceOffer());
     }
 
 
