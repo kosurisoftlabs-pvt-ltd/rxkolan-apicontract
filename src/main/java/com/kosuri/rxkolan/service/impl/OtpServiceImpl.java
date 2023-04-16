@@ -34,11 +34,11 @@ public class OtpServiceImpl implements OtpService {
         //Generate The Template to send OTP
         Optional<UserOtp> userOtpOptional = userOtpRepository.findByUserAndActiveTrue(user);
         String otp = String.valueOf(PhoneUtil.generateFourDigitOTP());
-        EmailTemplate template = new EmailTemplate("send-otp.html");
+        EmailTemplate template = new EmailTemplate("static/send-otp.html");
         Map<String,String> replacements = new HashMap<>();
 
         replacements.put("user", email);
-        replacements.put("otp", String.valueOf(PhoneUtil.generateFourDigitOTP()));
+        replacements.put("otp", otp);
         String message = template.getTemplate(replacements);
         boolean messageSent =  emailService.sendEmailMessage(email,message,appProperties.getOtp().getEmailSubject());
        if(messageSent) {

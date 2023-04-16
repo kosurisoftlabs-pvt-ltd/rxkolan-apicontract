@@ -19,7 +19,7 @@ import static com.kosuri.rxkolan.constant.Constants.BEARER_KEY;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(value = "/v1/role")
+@RequestMapping(value = "/v1/auth/role")
 @SecurityRequirement(name = BEARER_KEY)
 public class RoleController {
 

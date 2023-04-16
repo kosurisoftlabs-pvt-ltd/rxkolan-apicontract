@@ -19,7 +19,7 @@ public class EmailServiceImpl implements EmailService {
     private final JavaMailSender javaMailSender;
 
     @Override
-    public boolean sendEmailMessage(String to, String subject, String message) {
+    public boolean sendEmailMessage(String to, String message,String subject) {
         try {
             MimeMessage msg = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(msg, true);

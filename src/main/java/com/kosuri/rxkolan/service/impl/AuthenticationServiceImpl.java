@@ -67,7 +67,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .emailVerified(false).phoneVerified(false).password(passwordEncoder.encode(registerRequest.getPassword()))
                 .speciality(registerRequest.getSpeciality()).serviceOffer(registerRequest.getServiceOffered().getDescription())
                 .districtLocation(registerRequest.getDistrictLocation()).roles(!CollectionUtils.isEmpty(roles)?roles:null)
-                .serviceOffer(registerRequest.getServiceOffered().name())
+                .serviceOffer(registerRequest.getServiceOffered().getDescription())
                 .build();
         user = userRepository.save(user);
         boolean emailOtpSent = otpService.sendOtpToEmail(registerRequest.getEmail(), user);
@@ -81,12 +81,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public ResponseEntity<AuthenticationResponse> authenticate(AuthenticationRequest authenticationRequest, HttpServletRequest request) {
+        Authentication authentication = null;
+        if (StringUtils.isNotEmpty(authenticationRequest.getEmail())) {
+            authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(authenticationRequest.getEmail(), authenticationRequest.getPassword())
+            );
+        }
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(authenticationRequest.getEmail(), authenticationRequest.getPassword())
-        );
-
-        if(!authentication.isAuthenticated()){
+       else if (StringUtils.isNotEmpty(authenticationRequest.getPhoneNumber())) {
             //Trying with Phone Number than Email Authentication as Email Authentication has Failed
             authentication =  authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(authenticationRequest.getPhoneNumber(), authenticationRequest.getPassword())
@@ -124,20 +126,25 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         boolean isEmailOtpValid = false;
         boolean isPhoneOtpValid = false;
         Optional<User> userOptional;
+        User user = new User();
         if(StringUtils.isNotEmpty(verifyUserOtpRequest.getEmail())){
             log.info("Verifying OTP send to Email {}",verifyUserOtpRequest.getEmail());
             userOptional =  userRepository.findByEmail(verifyUserOtpRequest.getEmail());
+            if(userOptional.isPresent())
+                   user = userOptional.get();
             isEmailOtpValid = otpService.validateEmailOtp(verifyUserOtpRequest.getOtp(), verifyUserOtpRequest.getEmail());
+            user.setEmailVerified(isEmailOtpValid);
         }else{
             log.info("Verifying OTP send to Email {}",verifyUserOtpRequest.getPhoneNumber());
             userOptional =  userRepository.findByPhoneNumber(verifyUserOtpRequest.getPhoneNumber());
+            if(userOptional.isPresent())
+                user = userOptional.get();
             isPhoneOtpValid = otpService.validatePhoneOtp(verifyUserOtpRequest.getOtp(), verifyUserOtpRequest.getPhoneNumber());
+            user.setPhoneVerified(isPhoneOtpValid);
         }
 
         if(userOptional.isPresent() && (isEmailOtpValid || isPhoneOtpValid)){
-           User user =  userOptional.get();
-           user.setEmailVerified(isEmailOtpValid);
-           user.setPhoneVerified(isPhoneOtpValid);
+            user.setEnabled(true);
             user = userRepository.save(user);
             return new UserResponse(user);
         }

@@ -1,47 +1,62 @@
 package com.kosuri.rxkolan.template;
 
+import com.kosuri.rxkolan.exception.BadRequestException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.ResourceUtils;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
+@Slf4j
 public class EmailTemplate {
 
     private String template;
-    private Map<String, String> replacementParams;
 
-    public EmailTemplate(String customtemplate) {
+    public EmailTemplate(String customTemplate) {
         try {
-            this.template = loadTemplate(customtemplate);
+            this.template = loadTemplate(customTemplate);
         } catch (Exception e) {
             this.template = "Empty";
         }
 
     }
 
-    private String loadTemplate(String customtemplate) throws Exception {
-        ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource(customtemplate).getFile());
-        String content = "Empty";
-        try {
-            content = new String(Files.readAllBytes(file.toPath()));
-        } catch (IOException e) {
-            throw new Exception("Could not read template  = " + customtemplate);
-        }
-        return content;
+    private String loadTemplate(String customTemplate){
+        return getResourceFileAsString(customTemplate);
 
     }
 
     public String getTemplate(Map<String, String> replacements) {
 
-        String cTemplate = this.template;
+        String customTemplate = this.template;
         //Replace the String
         for (Map.Entry<String, String> entry : replacements.entrySet()) {
-            cTemplate = cTemplate.replace("{{" + entry.getKey() + "}}", entry.getValue());
+            customTemplate = customTemplate.replace("{{" + entry.getKey() + "}}", entry.getValue());
         }
-        return cTemplate;
+        return customTemplate;
+    }
+
+    public static String getResourceFileAsString(String fileName) {
+        InputStream is = getResourceFileAsInputStream(fileName);
+        if (is != null) {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+            return reader.lines().collect(Collectors.joining(System.lineSeparator()));
+        } else {
+            throw new BadRequestException("Resource not found");
+        }
+    }
+
+    public static InputStream getResourceFileAsInputStream(String fileName) {
+        ClassLoader classLoader = EmailTemplate.class.getClassLoader();
+        return classLoader.getResourceAsStream(fileName);
     }
 }
