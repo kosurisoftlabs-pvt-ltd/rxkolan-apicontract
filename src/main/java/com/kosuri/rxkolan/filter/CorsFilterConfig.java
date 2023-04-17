@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/*
 @Component
 public class CorsFilterConfig extends OncePerRequestFilter {
     private static final Logger corsLogger = LogManager.getLogger(CorsFilterConfig.class);
@@ -35,4 +36,4 @@ public class CorsFilterConfig extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         }
     }
-}
+}*/
