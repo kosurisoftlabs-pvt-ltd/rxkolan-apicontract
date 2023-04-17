@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,6 +22,7 @@ import static com.kosuri.rxkolan.constant.Constants.BEARER_KEY;
 @RequiredArgsConstructor
 @RequestMapping(value = "/v1/auth/role")
 @SecurityRequirement(name = BEARER_KEY)
+@CrossOrigin(origins = "http://localhost:3000")
 public class RoleController {
 
     private final RoleService roleService;

@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-/*
+
 @Component
 public class CorsFilterConfig extends OncePerRequestFilter {
     private static final Logger corsLogger = LogManager.getLogger(CorsFilterConfig.class);
@@ -23,6 +23,7 @@ public class CorsFilterConfig extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         corsLogger.log(Level.INFO, "in CORS filter method");
+        response.setHeader("Access-Control-Allow-Origin", "*");
         response.addHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
         response.addHeader("Access-Control-Max-Age", "3600");
         response.addHeader("Access-Control-Allow-Headers","Origin, X-Requested-With, Content-Type, Accept, X-Auth-Token, X-Csrf-Token, Authorization");
@@ -36,4 +37,4 @@ public class CorsFilterConfig extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         }
     }
-}*/
+}
