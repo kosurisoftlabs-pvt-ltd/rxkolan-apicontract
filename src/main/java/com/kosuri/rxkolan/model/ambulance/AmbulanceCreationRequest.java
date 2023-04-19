@@ -17,6 +17,9 @@ public class AmbulanceCreationRequest {
     @NotNull(message="Vehicle  Brand Cannot Be Empty")
     private String vehicleBrand;
 
+    @NotNull(message="Vehicle  Model Cannot Be Empty")
+    private String vehicleModel;
+
     @NotNull(message="Vehicle  VIN Cannot Be Empty")
     private String vin;
 
@@ -33,7 +36,8 @@ public class AmbulanceCreationRequest {
     @NotNull(message="Contact Number Cannot Be Empty")
     private String contactNumber;
 
-    private  String rtoRegisteredWith;
+    @NotNull(message = "RTO Registered Location")
+    private  String rtoRegisteredLocation;
 
     @NotNull(message="State Cannot Be Empty")
     private String state;

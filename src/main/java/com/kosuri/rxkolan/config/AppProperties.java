@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 public class AppProperties {
 
     private final Auth auth = new Auth();
+    private final AwsConfig awsConfig = new AwsConfig();
     private final TextLocal textLocal = new TextLocal();
     private final Otp otp = new Otp();
 
@@ -35,5 +36,18 @@ public class AppProperties {
     public static class Otp {
         private String smsMessage;
         private String emailSubject;
+    }
+
+    @Getter
+    @Setter
+    public static class AwsConfig {
+        private String accessKey;
+        private String secretKey;
+        private String bucketRegion;
+        private long urlExpirationTime;
+        private String privateBucketName;
+        private String licenseCertificate;
+        private String vehicleRc;
+        private String licensePlate;
     }
 }

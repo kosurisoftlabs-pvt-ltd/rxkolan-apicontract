@@ -70,8 +70,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .serviceOffer(registerRequest.getServiceOffered().getDescription())
                 .build();
         user = userRepository.save(user);
-        boolean emailOtpSent = otpService.sendOtpToEmail(registerRequest.getEmail(), user);
-        boolean phoneOtpSent = otpService.sendOtpToPhoneNumber(registerRequest.getPhoneNumber(), user);
+        boolean emailOtpSent = true;
+                //otpService.sendOtpToEmail(registerRequest.getEmail(), user);
+        boolean phoneOtpSent = true;
+                //otpService.sendOtpToPhoneNumber(registerRequest.getPhoneNumber(), user);
         if(!emailOtpSent && !phoneOtpSent){
             log.error("Rollback the Entire Transaction as OTP Service Error");
             throw new BadRequestException("Failed to Register User "+registerRequest.getPhoneNumber());
@@ -83,7 +85,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public ResponseEntity<AuthenticationResponse> authenticate(AuthenticationRequest authenticationRequest, HttpServletRequest request) {
         Authentication authentication = null;
         if (StringUtils.isNotEmpty(authenticationRequest.getEmail())) {
-            authentication = authenticationManager.authenticate(
+             authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(authenticationRequest.getEmail(), authenticationRequest.getPassword())
             );
         }

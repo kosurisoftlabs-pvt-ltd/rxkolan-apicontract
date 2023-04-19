@@ -1,7 +1,10 @@
 package com.kosuri.rxkolan.service.impl;
 
+import com.kosuri.rxkolan.config.AppProperties;
 import com.kosuri.rxkolan.constant.ErrorConstants;
 import com.kosuri.rxkolan.entity.Ambulance;
+import com.kosuri.rxkolan.entity.ApprovalStatus;
+import com.kosuri.rxkolan.entity.DocumentType;
 import com.kosuri.rxkolan.entity.ServiceOfferedEnum;
 import com.kosuri.rxkolan.exception.BadRequestException;
 import com.kosuri.rxkolan.model.ambulance.AmbulanceUpdateRequest;
@@ -14,10 +17,13 @@ import com.kosuri.rxkolan.model.ambulance.AmbulanceResponse;
 import com.kosuri.rxkolan.search.AmbulanceSpecificationBuilder;
 import com.kosuri.rxkolan.security.TokenProvider;
 import com.kosuri.rxkolan.service.AmbulanceService;
+import com.kosuri.rxkolan.service.DocumentService;
+import com.kosuri.rxkolan.service.UserService;
 import com.kosuri.rxkolan.util.PageUtil;
 import com.kosuri.rxkolan.util.RequestUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -29,6 +35,7 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -38,7 +45,9 @@ public class AmbulanceServiceImpl implements AmbulanceService {
 
     private final AmbulanceRepository ambulanceRepository;
     private final TokenProvider tokenProvider;
-
+    private final DocumentService documentService;
+    private final AppProperties appProperties;
+    private final UserService userService;
 
     @Override
     @Transactional
@@ -55,13 +64,25 @@ public class AmbulanceServiceImpl implements AmbulanceService {
             ambulance.setBaseLocation(ambulanceCreationRequest.getBaseLocation());
             ambulance.setState(ambulanceCreationRequest.getState());
             ambulance.setAdditionalFeatures(ambulanceCreationRequest.getAdditionalFeatures());
+            ambulance.setRtoRegisteredLocation(ambulanceCreationRequest.getRtoRegisteredLocation());
             ambulance.setOwnerName(ambulanceCreationRequest.getOwnerName());
             ambulance.setPhoneNumber(ambulanceCreationRequest.getContactNumber());
             ambulance.setVehicleBrand(ambulanceCreationRequest.getVehicleBrand());
+            ambulance.setVehicleModel(ambulanceCreationRequest.getVehicleModel());
             ambulance.setVin(ambulanceCreationRequest.getVin());
             ambulance.setVerified(false);
             ambulance.setUserEmail(username);
             ambulance.setRegisteredDate(LocalDate.now(ZoneOffset.UTC));
+            ambulance = ambulanceRepository.save(ambulance);
+            if(CollectionUtils.isNotEmpty(vehicleRC)){
+                ambulance.setAmbulanceRelatedImages(documentService.uploadDocuments(vehicleRC, DocumentType.VEHICLE_RC,ambulance.getAmbulanceRegNumber(),appProperties.getAwsConfig().getVehicleRc(), ApprovalStatus.PENDING));
+            }
+            if(CollectionUtils.isNotEmpty(licenseCertificate)){
+                ambulance.setAmbulanceRelatedImages(documentService.uploadDocuments(licenseCertificate, DocumentType.AMBULANCE_LICENSE_CERTIFICATE,ambulance.getAmbulanceRegNumber(),appProperties.getAwsConfig().getLicenseCertificate(), ApprovalStatus.PENDING));
+            }
+            if(Objects.nonNull(numberPlatePhoto)){
+                ambulance.setAmbulanceRelatedImages(documentService.uploadDocuments(List.of(numberPlatePhoto), DocumentType.AMBULANCE_LICENSE_PLATE,ambulance.getAmbulanceRegNumber(),appProperties.getAwsConfig().getLicensePlate(), ApprovalStatus.PENDING));
+            }
             ambulance = ambulanceRepository.save(ambulance);
         }else{
             log.error("Ambulance with Registration Number {} Has already been Registered In The System",ambulanceCreationRequest.getRegistrationNumber());
